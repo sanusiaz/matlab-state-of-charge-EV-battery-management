@@ -10,7 +10,7 @@
 
 fprintf('--- Stage 1: Loading data ---\n');
 
-DATASET_ROOT  = './Dataset_Li-ion';   % <-- adjust if needed
+DATASET_ROOT  = 'C:\Users\DELL\Documents\MATLAB\500 level project\first semester\Dataset_Li-ion';   % <-- adjust if needed
 TARGET_SUBDIR = '25degC';             % only this temperature folder
 MAX_ROWS      = 50000;                % safety cap — increase if you want more
 
@@ -62,6 +62,17 @@ for j = 1:numel(csvFiles)
         fprintf('  No matching current rows: %s\n', csvFiles(j).name);
         continue;
     end
+
+    %% FIX: Keep ONLY needed columns before stacking.
+    %% Files differ in types for 'Prog Time', 'Ah', 'Wh' etc. (text vs
+    %% duration vs double) which causes vertcat to fail. Strip to just
+    %% Voltage/Current/Temperature/SOC/Capacity to avoid ALL type mismatches.
+    keepCols = {'Voltage', 'Current', 'Temperature'};
+    vNames   = tbl.Properties.VariableNames;
+    if ismember('SOC',      vNames); keepCols{end+1} = 'SOC';      end
+    if ismember('Capacity', vNames); keepCols{end+1} = 'Capacity'; end
+    keepCols = keepCols(ismember(keepCols, vNames));
+    tbl = tbl(:, keepCols);
 
     allFrames{end+1} = tbl; %#ok<AGROW>
     totalRows = totalRows + height(tbl);
