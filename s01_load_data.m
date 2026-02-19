@@ -12,12 +12,12 @@ fprintf('--- Stage 1: Loading data ---\n');
 
 DATASET_ROOT  = 'C:\Users\DELL\Documents\MATLAB\500 level project\first semester\Dataset_Li-ion';   % <-- adjust if needed
 TARGET_SUBDIR = '25degC';             % only this temperature folder
-MAX_ROWS      = 50000;                % safety cap — increase if you want more
+MAX_ROWS      = 500000;                % safety cap — increase if you want more
 
 %% Current bands to keep (discharge means negative current in this dataset)
 %% We accept both signs so the filter is safe regardless of sign convention
-CURRENT_TARGETS  = [0.75, 0.10];  % amps
-CURRENT_BAND     = 0.15;          % ± tolerance around each target
+CURRENT_TARGETS  = [0.75, 0.10, 1.5, 2.0, 3.0];  % amps
+CURRENT_BAND     = 0.20;          % ± tolerance around each target
 
 %% ---- Find CSV files ----
 folderPath = fullfile(DATASET_ROOT, TARGET_SUBDIR);
