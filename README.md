@@ -1,6 +1,6 @@
 # SOC Estimation — LG HG2 Li-ion Battery
 ### Comparison of Ensemble Methods and Feedforward Neural Networks
-### Mechatronics Engineering Final Year Project | Ahmadu Bello University, Zaria
+### Automotive Engineering Final Year Project | Ahmadu Bello University, Zaria
 
 ---
 
