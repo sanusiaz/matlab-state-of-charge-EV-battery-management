@@ -10,7 +10,7 @@
 
 fprintf('--- Stage 1: Loading data ---\n');
 
-DATASET_ROOT  = 'C:\Users\DELL\Documents\MATLAB\500 level project\first semester\Dataset_Li-ion';   % <-- adjust if needed
+DATASET_ROOT  = './Dataset_Li-ion';   % <-- adjust if needed
 TARGET_SUBDIR = '25degC';             % only this temperature folder i.e 25deg, 40deg , 10deg or 0deg 
 MAX_ROWS      = 500000;                % safety cap — increase if you want more
 
