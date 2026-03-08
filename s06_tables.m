@@ -52,7 +52,7 @@ T1 = table([t1_names';t1_names'], ...
     [t1_train(:,4);t1_test(:,4)], ...
     'VariableNames', {'Model','MAE','MSE','RMSE','R_squared'});
 T1.Phase = [repmat({'Training'},4,1); repmat({'Testing'},4,1)];
-writetable(T1, 'Table1_ensemble_results.csv');
+writetable(T1, fullfile('tables', 'Table1_ensemble_results.csv'));
 fprintf('\n  Table 1 saved: Table1_ensemble_results.csv\n\n');
 
 
@@ -76,7 +76,7 @@ T2 = array2table(nn_results_train, 'VariableNames', {'MAE','MSE','RMSE','R_squar
 T2.Model      = nn_labels(:,1);
 T2.Activation = nn_labels(:,2);
 T2 = T2(:, [5 6 1 2 3 4]);
-writetable(T2, 'Table2_nn_training.csv');
+writetable(T2, fullfile('tables', 'Table2_nn_training.csv'));
 fprintf('\n  Table 2 saved: Table2_nn_training.csv\n\n');
 
 
@@ -100,7 +100,7 @@ T3 = array2table(nn_results_test, 'VariableNames', {'MAE','MSE','RMSE','R_square
 T3.Model      = nn_labels(:,1);
 T3.Activation = nn_labels(:,2);
 T3 = T3(:, [5 6 1 2 3 4]);
-writetable(T3, 'Table3_nn_testing.csv');
+writetable(T3, fullfile('tables', 'Table3_nn_testing.csv'));
 fprintf('\n  Table 3 saved: Table3_nn_testing.csv\n\n');
 
 
@@ -134,7 +134,7 @@ T4 = table(wide_labels_doubled, ...
     [wide_results_train(:,4);wide_results_test(:,4)], ...
     'VariableNames', {'Parameters','MAE','MSE','RMSE','R_squared'});
 T4.Phase = [repmat({'Training'},3,1); repmat({'Testing'},3,1)];
-writetable(T4, 'Table4_wide_trilayer.csv');
+writetable(T4, fullfile('tables', 'Table4_wide_trilayer.csv'));
 fprintf('\n  Table 4 saved: Table4_wide_trilayer.csv\n\n');
 
 
@@ -176,7 +176,7 @@ end
 
 T5 = table(t5_methods, t5_errors, t5_method_col, ...
     'VariableNames', {'Method','Error_Percent','Error_Metric'});
-writetable(T5, 'Table5_method_comparison.csv');
-fprintf('\n  Table 5 saved: Table5_method_comparison.csv\n\n');
+writetable(T5, fullfile('tables', 'Table5_method_comparison.csv'));
+fprintf('\n  Table 5 saved: tables/Table5_method_comparison.csv\n\n');
 
 fprintf('Stage 6 complete — all tables printed and saved.\n');

@@ -18,7 +18,7 @@
 
 fprintf('--- Stage 5: Generating all figures ---\n');
 
-saveFig = @(name) saveas(gcf, [name, '.png']);
+saveFig = @(name) saveas(gcf, fullfile('figures', [name, '.png']));
 
 %% =====================================================================
 %% FIG 2 — Training data profile (6-panel, matches paper Fig 2)
