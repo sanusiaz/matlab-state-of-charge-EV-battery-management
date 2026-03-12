@@ -22,10 +22,10 @@ nn_labels        = cell(15, 2);   % {model name, activation}
 row = 0;
 
 modelConfigs = {
-    'Narrow',   [10],     1000;
-    'Medium',   [25],     1000;
-    'Wide',     [100],    1000;
-    'Bi-layer', [10,10],  1000;
+    'Narrow',   [10],      1000;
+    'Medium',   [25],      1000;
+    'Wide',     [100],     1000;
+    'Bi-layer', [10,10],   1000;
     'Tri-layer',[10,10,10],1000
 };
 
@@ -54,6 +54,16 @@ for m = 1:size(modelConfigs, 1)
         nn_results_test(row,:)  = computeNNMetrics(y_test,  pred_test);
         nn_labels{row,1} = mName;
         nn_labels{row,2} = actLabels{a};
+
+        %% Save Wide+ReLU predictions for Fig11 in s05_figures.m
+        %% Wide is model index 3, ReLU is activation index 1
+        %% Row number = (3-1)*3 + 1 = 7
+        if strcmp(mName, 'Wide') && strcmp(actName, 'relu')
+            wide_relu_pred_test  = pred_test;
+            wide_relu_pred_train = pred_train;
+            fprintf('  Saved Wide+ReLU predictions for Fig11.\n');
+        end
+
     end
 end
 

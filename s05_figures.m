@@ -1,39 +1,66 @@
 %% =============================================================================
-%% s05_figures.m  — Generate all figures from the paper
+%% s05_figures.m  — Generate all figures
 %%
-%% Figure list (matches paper numbering):
+%% Figure list:
 %%   Fig 2  — Training data profile (V, I, T, avg V, avg I, SOC)
 %%   Fig 4  — MAE & RMSE comparison — ensemble models (training)
 %%   Fig 5  — MAE & RMSE comparison — ensemble models (testing)
 %%   Fig 10 — RMSE bar chart across all NN models
-%%   Fig 11 — Residual plot — wide neural network (best model)
-%%   Fig 12 — Residual plot — tri-layered network
-%%   Fig 13 — Validation performance curve (single-layer, simulated)
-%%   Fig 14 — Training/test regression plot (single-layer)
-%%   Fig 15 — Validation performance curve (tri-layer)
-%%   Fig 16 — Training/test regression plot (tri-layer)
+%%   Fig 11 — Residual plot — wide neural network (Wide+ReLU from Stage 3)
+%%   Fig 12 — Residual plot — tri-layered network (best model from Stage 4)
+%%   Fig 13 — Convergence curve (single-layer FFNN)
+%%   Fig 14 — Training/test regression plot (single-layer FFNN)
+%%   Fig 15 — Convergence curve (tri-layer FFNN)
+%%   Fig 16 — Training/test regression plot (tri-layer FFNN)
 %%   Fig 17 — Error histogram (single-layer FFNN)
 %%   Fig 18 — Error histogram (tri-layered FFNN)
+%%   Fig 6  — OCV as a function of State of Charge (theoretical reference)
 %% =============================================================================
 
 fprintf('--- Stage 5: Generating all figures ---\n');
 
+%% ---- Memory management before figure generation ----
+%% Closes open windows and clears large model objects no longer needed.
+%% Protected list covers every variable used by Stages 5, 6, and 7.
+close all;
+
+keepVars = {'X_train', 'X_test', 'y_train', 'y_test', ...
+            'X_train_raw', 'X_test_raw', 'y_train_raw', 'y_test_raw', ...
+            'yMin', 'yMax', 'targetCol', ...
+            'results_train', 'results_test', 'ensemble_preds_test', ...
+            'nn_results_train', 'nn_results_test', 'nn_labels', ...
+            'wide_results_train', 'wide_results_test', 'wide_labels', ...
+            'best_pred_test', 'best_pred_train', ...
+            'best_pred_real', 'best_true_real', ...
+            'wide_relu_pred_test', 'wide_relu_pred_train'};
+
+varList = whos;
+for i = 1:length(varList)
+    v = varList(i);
+    if v.bytes > 50e6 && ~ismember(v.name, keepVars)
+        clear(v.name);
+        fprintf('  Cleared from memory: %s (%.1f MB)\n', v.name, v.bytes/1e6);
+    end
+end
+
+fprintf('  Memory ready for figure generation.\n\n');
+
 saveFig = @(name) saveas(gcf, fullfile('figures', [name, '.png']));
 
+
 %% =====================================================================
-%% FIG 2 — Training data profile (6-panel, matches paper Fig 2)
+%% FIG 2 — Training data profile (6-panel)
 %% =====================================================================
 figure('Name','Fig2 - Training Data Profile','NumberTitle','off',...
        'Position',[100 100 1100 650]);
 
-nPlot  = min(5000, numel(y_train));   % plot a sample to keep it fast
+nPlot  = min(5000, numel(y_train));
 xAxis  = (1:nPlot)';
 Vtr    = X_train_raw(1:nPlot, 1);
 Itr    = X_train_raw(1:nPlot, 2);
 Ttr    = X_train_raw(1:nPlot, 3);
 Ytr    = y_train_raw(1:nPlot);
 
-% Normalise each signal 0-1 for the combined display (matches paper)
 normIt = @(v) (v - min(v)) ./ (max(v) - min(v) + eps);
 
 subplot(2,3,1);
@@ -124,7 +151,7 @@ fprintf('  Saved: Fig5_ensemble_testing.png\n');
 %% =====================================================================
 %% FIG 10 — RMSE bar chart: ALL neural network models (test)
 %% =====================================================================
-allRMSEs  = nn_results_test(:, 3);   % column 3 = RMSE
+allRMSEs  = nn_results_test(:, 3);
 barLabels = cell(15, 1);
 for r = 1:15
     barLabels{r} = sprintf('%s\n%s', nn_labels{r,1}, nn_labels{r,2});
@@ -135,7 +162,6 @@ bar(1:15, allRMSEs, 'FaceColor', [0.2 0.4 0.8]);
 set(gca,'XTick',1:15,'XTickLabel',barLabels,'XTickLabelRotation',45,'FontSize',7);
 ylabel('RMSE'); title('Fig 10 — RMSE Across All Neural Network Models (Test)');
 grid on;
-% Annotate the minimum
 [minVal, minIdx] = min(allRMSEs);
 text(minIdx, minVal, sprintf('  Best\n  %.4f', minVal), ...
      'FontSize',8,'Color','red','FontWeight','bold');
@@ -144,17 +170,15 @@ fprintf('  Saved: Fig10_all_nn_rmse.png\n');
 
 
 %% =====================================================================
-%% FIG 11 — Residual plot: WIDE neural network (test predictions)
-%%          Using the wide single-layer [100] model (row 7 = Wide+ReLU)
+%% FIG 11 — Residual plot: WIDE neural network (Wide+ReLU from Stage 3)
+%%
+%% Uses wide_relu_pred_test saved by s03_neural_networks.m
+%% No retraining is done here.
 %% =====================================================================
-wide_relu_net = fitrnet(X_train, y_train, ...
-    'LayerSizes',1000,'Activations','relu', ...
-    'Standardize',false,'IterationLimit',1000,'Lambda',0,'Verbose',0);
-fig11_pred  = predict(wide_relu_net, X_test);
-fig11_resid = y_test - fig11_pred;
+fig11_resid = y_test - wide_relu_pred_test;
 
 figure('Name','Fig11 - Wide NN Residuals','NumberTitle','off','Position',[100 100 800 400]);
-scatter(fig11_pred, fig11_resid, 4, [0.85 0.3 0.1], 'filled', ...
+scatter(wide_relu_pred_test, fig11_resid, 4, [0.85 0.3 0.1], 'filled', ...
         'MarkerFaceAlpha', 0.3); hold on;
 yline(0,'k--','LineWidth',1.2);
 xlabel('Predicted Response'); ylabel('Residuals (Var6)');
@@ -183,11 +207,12 @@ fprintf('  Saved: Fig12_residual_trilayer.png\n');
 
 
 %% =====================================================================
-%% FIG 13 — Validation performance curve: Single-layer FFNN
-%%          (MSE loss vs iterations — approximate using convergence data)
+%% FIG 13 — Convergence curve: Single-layer FFNN [10 neurons, Tanh]
+%%
+%% Trains a small network at increasing iteration budgets to show
+%% how MSE decreases with more iterations. Illustrative figure only —
+%% no table metrics depend on this.
 %% =====================================================================
-% fitrnet does not return epoch-by-epoch history, so we simulate the
-% convergence curve shape by training at increasing iteration budgets
 fprintf('  Generating Fig13 convergence curve (may take ~30 sec)...\n');
 iterPts   = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
 mse_curve = zeros(size(iterPts));
@@ -199,7 +224,7 @@ for k = 1:numel(iterPts)
     mse_curve(k) = mean((y_test - p).^2);
 end
 
-figure('Name','Fig13 - Single-layer Validation','NumberTitle','off','Position',[100 100 700 400]);
+figure('Name','Fig13 - Single-layer Convergence','NumberTitle','off','Position',[100 100 700 400]);
 semilogy(iterPts, mse_curve, 'b-o', 'LineWidth', 1.5, 'MarkerSize', 5);
 xlabel('Iterations'); ylabel('Mean Squared Error (MSE)');
 title(sprintf('Fig 13 — Single-Layer FFNN Convergence\nBest MSE: %.5f', min(mse_curve)));
@@ -210,6 +235,9 @@ fprintf('  Saved: Fig13_singlelayer_convergence.png\n');
 
 %% =====================================================================
 %% FIG 14 — Training/Test regression plot: Single-layer FFNN
+%%
+%% Trains a small [10, Tanh, 1000 iter] network for the regression plot.
+%% Same architecture as the Narrow+Tanh config in Stage 3.
 %% =====================================================================
 sl_net       = fitrnet(X_train, y_train, 'LayerSizes', 10, ...
     'Activations','tanh','Standardize',false, ...
@@ -238,7 +266,9 @@ fprintf('  Saved: Fig14_singlelayer_regression.png\n');
 
 
 %% =====================================================================
-%% FIG 15 — Validation convergence: Tri-layered FFNN
+%% FIG 15 — Convergence curve: Tri-layered FFNN [10,10,10 ReLU]
+%%
+%% Same approach as Fig13 — illustrative convergence shape only.
 %% =====================================================================
 fprintf('  Generating Fig15 tri-layer convergence curve...\n');
 mse_tri = zeros(size(iterPts));
@@ -261,6 +291,9 @@ fprintf('  Saved: Fig15_trilayer_convergence.png\n');
 
 %% =====================================================================
 %% FIG 16 — Training/Test regression plot: Tri-layered FFNN (best model)
+%%
+%% Uses best_pred_train and best_pred_test from Stage 4.
+%% No retraining done here.
 %% =====================================================================
 R_tr_tri = corr(y_train, best_pred_train)^2;
 R_te_tri = corr(y_test,  best_pred_test)^2;
@@ -316,28 +349,22 @@ legend('Training','Test','Zero Error'); grid on;
 saveFig('Fig18_error_hist_trilayer');
 fprintf('  Saved: Fig18_error_hist_trilayer.png\n');
 
+
 %% =====================================================================
-%% FIG 6 — OCV as a function of State of Charge
+%% FIG 6 — OCV as a function of State of Charge (theoretical reference)
 %%
-%% This is a REFERENCE figure (from Berglund et al., 2019, cited as [32]
-%% in the paper). It shows the theoretical non-linear relationship between
-%% Open Circuit Voltage (OCV) and SOC for a Li-ion battery.
-%% The curve is reproduced using the standard 6th-order polynomial OCV-SOC
-%% model for LiNMC chemistry, scaled to match the paper's voltage axis.
-%% It is NOT derived from the loaded dataset.
+%% This is a reference figure showing the theoretical non-linear
+%% relationship between Open Circuit Voltage (OCV) and SOC for a
+%% Li-ion battery. It is NOT derived from the loaded dataset.
+%% Curve uses a standard 6th-order polynomial OCV-SOC model for
+%% LiNMC chemistry scaled to a 4-cell series pack.
 %% =====================================================================
+soc_pct = linspace(0, 100, 500);
+z       = soc_pct / 100;
 
-soc_pct = linspace(0, 100, 500);   % SOC axis 0–100%
-z       = soc_pct / 100;           % normalise to [0,1] for polynomial
-
-%% 6th-order polynomial OCV model coefficients for LiNMC Li-ion cell
-%% (single cell, nominal ~3.6V). Coefficients tuned to reproduce the
-%% characteristic shape shown in the paper (flat middle, steep ends).
 p = [-16.4, 51.2, -61.8, 36.2, -10.4, 1.8, 3.0];
-ocv_single = polyval(p, z);        % single-cell OCV (V)
+ocv_single = polyval(p, z);
 
-%% The paper's Fig 6 shows a pack-level voltage (~8V–15V range),
-%% consistent with a 4-cell series configuration. Scale accordingly.
 num_cells = 4;
 ocv_pack  = ocv_single * num_cells;
 
@@ -353,14 +380,13 @@ yticks(8:1:15);
 grid on;
 box on;
 
-%% Annotate the non-linear region (20%–93% SOC as noted in the paper)
 hold on;
 xregion = [20, 93];
 yl = ylim;
 fill([xregion(1) xregion(2) xregion(2) xregion(1)], ...
      [yl(1) yl(1) yl(2) yl(2)], ...
      [0.9 0.95 1.0], 'EdgeColor', 'none', 'FaceAlpha', 0.25);
-text(40, 8.4, 'Non-linear OCV region (20%–93% SOC)', ...
+text(40, 8.4, 'Non-linear OCV region (20%-93% SOC)', ...
      'FontSize', 8, 'Color', [0.2 0.2 0.6]);
 
 saveFig('Fig6_OCV_vs_SOC');
