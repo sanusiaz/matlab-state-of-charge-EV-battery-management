@@ -1,20 +1,20 @@
 %% =============================================================================
-%% s05_figures.m  — Generate all figures
+%% s05_figures.m — Generate all figures
 %%
 %% Figure list:
-%%   Fig 2  — Training data profile (V, I, T, avg V, avg I, SOC)
-%%   Fig 4  — MAE & RMSE comparison — ensemble models (training)
-%%   Fig 5  — MAE & RMSE comparison — ensemble models (testing)
-%%   Fig 10 — RMSE bar chart across all NN models
-%%   Fig 11 — Residual plot — wide neural network (Wide+ReLU from Stage 3)
-%%   Fig 12 — Residual plot — tri-layered network (best model from Stage 4)
-%%   Fig 13 — Convergence curve (single-layer FFNN)
-%%   Fig 14 — Training/test regression plot (single-layer FFNN)
-%%   Fig 15 — Convergence curve (tri-layer FFNN)
-%%   Fig 16 — Training/test regression plot (tri-layer FFNN)
-%%   Fig 17 — Error histogram (single-layer FFNN)
-%%   Fig 18 — Error histogram (tri-layered FFNN)
-%%   Fig 6  — OCV as a function of State of Charge (theoretical reference)
+%% Fig 2 — Training data profile (V, I, T, avg V, avg I, SOC)
+%% Fig 4 — MAE & RMSE comparison — ensemble models (training)
+%% Fig 5 — MAE & RMSE comparison — ensemble models (testing)
+%% Fig 10 — RMSE bar chart across all NN models
+%% Fig 11 — Residual plot — wide neural network (Wide+ReLU from Stage 3)
+%% Fig 12 — Residual plot — tri-layered network (best model from Stage 4)
+%% Fig 13 — Convergence curve (single-layer FFNN)
+%% Fig 14 — Training/test regression plot (single-layer FFNN)
+%% Fig 15 — Convergence curve (tri-layer FFNN)
+%% Fig 16 — Training/test regression plot (tri-layer FFNN)
+%% Fig 17 — Error histogram (single-layer FFNN)
+%% Fig 18 — Error histogram (tri-layered FFNN)
+%% Fig 6 — OCV as a function of State of Charge (theoretical reference)
 %% =============================================================================
 
 fprintf('--- Stage 5: Generating all figures ---\n');
@@ -25,14 +25,14 @@ fprintf('--- Stage 5: Generating all figures ---\n');
 close all;
 
 keepVars = {'X_train', 'X_test', 'y_train', 'y_test', ...
-            'X_train_raw', 'X_test_raw', 'y_train_raw', 'y_test_raw', ...
-            'yMin', 'yMax', 'targetCol', ...
-            'results_train', 'results_test', 'ensemble_preds_test', ...
-            'nn_results_train', 'nn_results_test', 'nn_labels', ...
-            'wide_results_train', 'wide_results_test', 'wide_labels', ...
-            'best_pred_test', 'best_pred_train', ...
-            'best_pred_real', 'best_true_real', ...
-            'wide_relu_pred_test', 'wide_relu_pred_train'};
+    'X_train_raw', 'X_test_raw', 'y_train_raw', 'y_test_raw', ...
+    'yMin', 'yMax', 'targetCol', ...
+    'results_train', 'results_test', 'ensemble_preds_test', ...
+    'nn_results_train', 'nn_results_test', 'nn_labels', ...
+    'wide_results_train', 'wide_results_test', 'wide_labels', ...
+    'best_pred_test', 'best_pred_train', ...
+    'best_pred_real', 'best_true_real', ...
+    'wide_relu_pred_test', 'wide_relu_pred_train'};
 
 varList = whos;
 for i = 1:length(varList)
@@ -52,14 +52,14 @@ saveFig = @(name) saveas(gcf, fullfile('figures', [name, '.png']));
 %% FIG 2 — Training data profile (6-panel)
 %% =====================================================================
 figure('Name','Fig2 - Training Data Profile','NumberTitle','off',...
-       'Position',[100 100 1100 650]);
+    'Position',[100 100 1100 650]);
 
-nPlot  = min(5000, numel(y_train));
-xAxis  = (1:nPlot)';
-Vtr    = X_train_raw(1:nPlot, 1);
-Itr    = X_train_raw(1:nPlot, 2);
-Ttr    = X_train_raw(1:nPlot, 3);
-Ytr    = y_train_raw(1:nPlot);
+nPlot = min(5000, numel(y_train));
+xAxis = (1:nPlot)';
+Vtr = X_train_raw(1:nPlot, 1);
+Itr = X_train_raw(1:nPlot, 2);
+Ttr = X_train_raw(1:nPlot, 3);
+Ytr = y_train_raw(1:nPlot);
 
 normIt = @(v) (v - min(v)) ./ (max(v) - min(v) + eps);
 
@@ -97,15 +97,15 @@ fprintf('  Saved: Fig2_training_data_profile.png\n');
 %% =====================================================================
 %% FIG 4 — MAE & RMSE comparison — ensemble models (TRAINING)
 %% =====================================================================
-trainMAEs  = [results_train.lr_mae,  results_train.tree_mae, ...
-              results_train.bag_mae, results_train.boost_mae];
+trainMAEs = [results_train.lr_mae, results_train.tree_mae, ...
+    results_train.bag_mae, results_train.boost_mae];
 trainRMSEs = [results_train.lr_rmse, results_train.tree_rmse, ...
-              results_train.bag_rmse,results_train.boost_rmse];
-modX       = 1:4;
-mLabels    = {'Lin Reg','Tree','Bagged','Boosted'};
+    results_train.bag_rmse,results_train.boost_rmse];
+modX = 1:4;
+mLabels = {'Lin Reg','Tree','Bagged','Boosted'};
 
 figure('Name','Fig4 - Ensemble Training','NumberTitle','off',...
-       'Position',[100 100 900 380]);
+    'Position',[100 100 900 380]);
 subplot(1,2,1);
 scatter(modX, trainMAEs, 80, 'r+', 'LineWidth', 2); hold on;
 plot(modX, trainMAEs, 'r--');
@@ -125,13 +125,13 @@ fprintf('  Saved: Fig4_ensemble_training.png\n');
 %% =====================================================================
 %% FIG 5 — MAE & RMSE comparison — ensemble models (TESTING)
 %% =====================================================================
-testMAEs  = [results_test.lr_mae,  results_test.tree_mae, ...
-             results_test.bag_mae, results_test.boost_mae];
+testMAEs = [results_test.lr_mae, results_test.tree_mae, ...
+    results_test.bag_mae, results_test.boost_mae];
 testRMSEs = [results_test.lr_rmse, results_test.tree_rmse, ...
-             results_test.bag_rmse,results_test.boost_rmse];
+    results_test.bag_rmse,results_test.boost_rmse];
 
 figure('Name','Fig5 - Ensemble Testing','NumberTitle','off',...
-       'Position',[100 100 900 380]);
+    'Position',[100 100 900 380]);
 subplot(1,2,1);
 scatter(modX, testMAEs, 80, 'r+', 'LineWidth', 2); hold on;
 plot(modX, testMAEs, 'r--');
@@ -151,7 +151,7 @@ fprintf('  Saved: Fig5_ensemble_testing.png\n');
 %% =====================================================================
 %% FIG 10 — RMSE bar chart: ALL neural network models (test)
 %% =====================================================================
-allRMSEs  = nn_results_test(:, 3);
+allRMSEs = nn_results_test(:, 3);
 barLabels = cell(15, 1);
 for r = 1:15
     barLabels{r} = sprintf('%s\n%s', nn_labels{r,1}, nn_labels{r,2});
@@ -164,7 +164,7 @@ ylabel('RMSE'); title('Fig 10 — RMSE Across All Neural Network Models (Test)')
 grid on;
 [minVal, minIdx] = min(allRMSEs);
 text(minIdx, minVal, sprintf('  Best\n  %.4f', minVal), ...
-     'FontSize',8,'Color','red','FontWeight','bold');
+    'FontSize',8,'Color','red','FontWeight','bold');
 saveFig('Fig10_all_nn_rmse');
 fprintf('  Saved: Fig10_all_nn_rmse.png\n');
 
@@ -179,13 +179,13 @@ fig11_resid = y_test - wide_relu_pred_test;
 
 figure('Name','Fig11 - Wide NN Residuals','NumberTitle','off','Position',[100 100 800 400]);
 scatter(wide_relu_pred_test, fig11_resid, 4, [0.85 0.3 0.1], 'filled', ...
-        'MarkerFaceAlpha', 0.3); hold on;
+    'MarkerFaceAlpha', 0.3); hold on;
 yline(0,'k--','LineWidth',1.2);
 xlabel('Predicted Response'); ylabel('Residuals (Var6)');
 title('Fig 11 — Residual Plot: Wide Neural Network');
 xlim([0 1]); grid on;
 text(0.05, max(fig11_resid)*0.85, 'Region of Non-Linearity', ...
-     'FontSize', 8, 'Color', 'k');
+    'FontSize', 8, 'Color', 'k');
 saveFig('Fig11_residual_wide_nn');
 fprintf('  Saved: Fig11_residual_wide_nn.png\n');
 
@@ -197,7 +197,7 @@ fig12_resid = best_true_real - best_pred_real;
 
 figure('Name','Fig12 - Tri-layer Residuals','NumberTitle','off','Position',[100 100 800 400]);
 scatter(best_pred_real, fig12_resid, 4, [0.85 0.3 0.1], 'filled', ...
-        'MarkerFaceAlpha', 0.3); hold on;
+    'MarkerFaceAlpha', 0.3); hold on;
 yline(0,'k--','LineWidth',1.2);
 xlabel('Predicted Response'); ylabel('Residuals (Var6)');
 title('Fig 12 — Residual Plot: Tri-layered FFNN');
@@ -214,7 +214,7 @@ fprintf('  Saved: Fig12_residual_trilayer.png\n');
 %% no table metrics depend on this.
 %% =====================================================================
 fprintf('  Generating Fig13 convergence curve (may take ~30 sec)...\n');
-iterPts   = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+iterPts = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
 mse_curve = zeros(size(iterPts));
 for k = 1:numel(iterPts)
     tmpNet = fitrnet(X_train, y_train, 'LayerSizes', 10, ...
@@ -239,26 +239,26 @@ fprintf('  Saved: Fig13_singlelayer_convergence.png\n');
 %% Trains a small [10, Tanh, 1000 iter] network for the regression plot.
 %% Same architecture as the Narrow+Tanh config in Stage 3.
 %% =====================================================================
-sl_net       = fitrnet(X_train, y_train, 'LayerSizes', 10, ...
+sl_net = fitrnet(X_train, y_train, 'LayerSizes', 10, ...
     'Activations','tanh','Standardize',false, ...
     'IterationLimit',1000,'Lambda',0,'Verbose',0);
-sl_pred_tr   = predict(sl_net, X_train);
-sl_pred_te   = predict(sl_net, X_test);
+sl_pred_tr = predict(sl_net, X_train);
+sl_pred_te = predict(sl_net, X_test);
 R_tr = corr(y_train, sl_pred_tr)^2;
-R_te = corr(y_test,  sl_pred_te)^2;
+R_te = corr(y_test, sl_pred_te)^2;
 
 figure('Name','Fig14 - Single-layer Regression','NumberTitle','off','Position',[100 100 900 420]);
 subplot(1,2,1);
 scatter(y_train, sl_pred_tr, 3, 'k', 'filled','MarkerFaceAlpha',0.2); hold on;
 rl = refline(1,0); rl.Color='r'; rl.LineWidth=1.5;
 xlabel('Target'); ylabel('Output'); title(sprintf('Training: R=%.5f', sqrt(R_tr)));
-legend('Data','Fit','Y=T'); grid on;
+legend('Data','Fit'); grid on;
 
 subplot(1,2,2);
 scatter(y_test, sl_pred_te, 3, 'k','filled','MarkerFaceAlpha',0.2); hold on;
 rl = refline(1,0); rl.Color='r'; rl.LineWidth=1.5;
 xlabel('Target'); ylabel('Output'); title(sprintf('Test: R=%.5f', sqrt(R_te)));
-legend('Data','Fit','Y=T'); grid on;
+legend('Data','Fit'); grid on;
 
 sgtitle('Fig 14 — Single-Layer FFNN Training & Test Performance');
 saveFig('Fig14_singlelayer_regression');
@@ -296,20 +296,20 @@ fprintf('  Saved: Fig15_trilayer_convergence.png\n');
 %% No retraining done here.
 %% =====================================================================
 R_tr_tri = corr(y_train, best_pred_train)^2;
-R_te_tri = corr(y_test,  best_pred_test)^2;
+R_te_tri = corr(y_test, best_pred_test)^2;
 
 figure('Name','Fig16 - Tri-layer Regression','NumberTitle','off','Position',[100 100 900 420]);
 subplot(1,2,1);
 scatter(y_train, best_pred_train, 3, 'k','filled','MarkerFaceAlpha',0.2); hold on;
 rl = refline(1,0); rl.Color='r'; rl.LineWidth=1.5;
 xlabel('Target'); ylabel('Output'); title(sprintf('Training: R=%.5f', sqrt(R_tr_tri)));
-legend('Data','Fit','Y=T'); grid on;
+legend('Data','Fit'); grid on;
 
 subplot(1,2,2);
 scatter(y_test, best_pred_test, 3, 'k','filled','MarkerFaceAlpha',0.2); hold on;
 rl = refline(1,0); rl.Color='r'; rl.LineWidth=1.5;
 xlabel('Target'); ylabel('Output'); title(sprintf('Test: R=%.5f', sqrt(R_te_tri)));
-legend('Data','Fit','Y=T'); grid on;
+legend('Data','Fit'); grid on;
 
 sgtitle('Fig 16 — Tri-Layer FFNN Training & Test Performance');
 saveFig('Fig16_trilayer_regression');
@@ -320,7 +320,7 @@ fprintf('  Saved: Fig16_trilayer_regression.png\n');
 %% FIG 17 — Error Histogram: Single-layer FFNN
 %% =====================================================================
 err_sl_tr = y_train - sl_pred_tr;
-err_sl_te = y_test  - sl_pred_te;
+err_sl_te = y_test - sl_pred_te;
 
 figure('Name','Fig17 - Single-layer Error Histogram','NumberTitle','off','Position',[100 100 700 420]);
 histogram(err_sl_tr, 20, 'FaceColor', [0.2 0.6 0.2], 'FaceAlpha', 0.6); hold on;
@@ -337,7 +337,7 @@ fprintf('  Saved: Fig17_error_hist_singlelayer.png\n');
 %% FIG 18 — Error Histogram: Tri-layered FFNN (best model)
 %% =====================================================================
 err_tri_tr = y_train - best_pred_train;
-err_tri_te = y_test  - best_pred_test;
+err_tri_te = y_test - best_pred_test;
 
 figure('Name','Fig18 - Tri-layer Error Histogram','NumberTitle','off','Position',[100 100 700 420]);
 histogram(err_tri_tr, 20, 'FaceColor', [0.2 0.6 0.2], 'FaceAlpha', 0.6); hold on;
@@ -360,16 +360,16 @@ fprintf('  Saved: Fig18_error_hist_trilayer.png\n');
 %% LiNMC chemistry scaled to a 4-cell series pack.
 %% =====================================================================
 soc_pct = linspace(0, 100, 500);
-z       = soc_pct / 100;
+z = soc_pct / 100;
 
 p = [-16.4, 51.2, -61.8, 36.2, -10.4, 1.8, 3.0];
 ocv_single = polyval(p, z);
 
 num_cells = 4;
-ocv_pack  = ocv_single * num_cells;
+ocv_pack = ocv_single * num_cells;
 
 figure('Name','Fig6 - OCV vs SOC','NumberTitle','off', ...
-       'Position',[100 100 520 480]);
+    'Position',[100 100 520 480]);
 plot(soc_pct, ocv_pack, 'b-', 'LineWidth', 2);
 xlabel('SOC [%]');
 ylabel('Voltage [V]');
@@ -384,10 +384,10 @@ hold on;
 xregion = [20, 93];
 yl = ylim;
 fill([xregion(1) xregion(2) xregion(2) xregion(1)], ...
-     [yl(1) yl(1) yl(2) yl(2)], ...
-     [0.9 0.95 1.0], 'EdgeColor', 'none', 'FaceAlpha', 0.25);
+    [yl(1) yl(1) yl(2) yl(2)], ...
+    [0.9 0.95 1.0], 'EdgeColor', 'none', 'FaceAlpha', 0.25);
 text(40, 8.4, 'Non-linear OCV region (20%-93% SOC)', ...
-     'FontSize', 8, 'Color', [0.2 0.2 0.6]);
+    'FontSize', 8, 'Color', [0.2 0.2 0.6]);
 
 saveFig('Fig6_OCV_vs_SOC');
 fprintf('  Saved: Fig6_OCV_vs_SOC.png\n');
